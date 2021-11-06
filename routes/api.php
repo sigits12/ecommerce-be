@@ -23,8 +23,8 @@ Route::group([
             'prefix' => 'products',
         ],
         function () {
-            Route::get('/', [ProductController::class, 'index']);
-            Route::post('/', [ProductController::class, 'store'])->middleware('permission:create products');;
+            Route::get('', [ProductController::class, 'index'])->name('products.index');
+            Route::post('', [ProductController::class, 'create'])->middleware('permission:create products')->name('products.create');
         }
     );
 });

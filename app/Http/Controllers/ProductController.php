@@ -2,43 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductCollection;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Validator;
 
 class ProductController extends Controller
 {
     public function __construct() {
         $this->middleware('auth:api');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        $product = Product::all();
-
-        return response()->json([$product], 200);
+        $product = Product::paginate();
+ 
+        return new ProductCollection($product);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function create(Request $request)
     {
-        return response()->json(['admin'], 200);
+        $validator = Validator::make($request->all(), [
+            'sku' => 'required|unique:products',
+            'nama_product' => 'required',
+            'harga' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json($validator->errors(), 400);
+        }
+
+        $product = Product::create($request->all());
+
+        return new ProductResource($product);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function show(Product $product)
     {
         //
